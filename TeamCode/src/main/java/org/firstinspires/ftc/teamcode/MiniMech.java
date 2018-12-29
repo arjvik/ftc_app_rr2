@@ -29,6 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
+import android.os.Environment;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -36,6 +41,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.vuforia.Image;
+import com.vuforia.PIXEL_FORMAT;
+import com.vuforia.Vuforia;
+
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
 
 
 /**
@@ -52,6 +70,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="MiniMech", group="Linear Opmode")
+@Config
 public class MiniMech extends LinearOpMode {
 
     // Declare OpMode members.
@@ -61,6 +80,12 @@ public class MiniMech extends LinearOpMode {
     private DcMotor rightFront = null;
     private DcMotor rightBack  = null;
 
+    public static int MIN_LOOP_TIME = 1000;
+    public static int QUALITY = 25;
+    public static int WIDTH = 320;
+    public static int HEIGHT = 240;
+    public static String FOLDER = Environment.getExternalStorageDirectory() + "/TrainingData/LEFT/";
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -69,10 +94,10 @@ public class MiniMech extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftFront = hardwareMap.get(DcMotor.class, "left_front");
-        leftBack = hardwareMap.get(DcMotor.class, "left_back");
-        rightFront = hardwareMap.get(DcMotor.class, "right_front");
-        rightBack = hardwareMap.get(DcMotor.class, "right_back");
+        leftFront = hardwareMap.get(DcMotor.class, "motorFrontLeft");
+        leftBack = hardwareMap.get(DcMotor.class, "motorBackLeft");
+        rightFront = hardwareMap.get(DcMotor.class, "motorFrontRight");
+        rightBack = hardwareMap.get(DcMotor.class, "motorBackRight");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -81,24 +106,32 @@ public class MiniMech extends LinearOpMode {
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
 
+        double msStuckDetectStop = 2500;
+
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+
+        VuforiaLocalizer.Parameters vuforiaParams = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
+        vuforiaParams.vuforiaLicenseKey = RC.VUFORIA_LICENSE_KEY;
+        vuforiaParams.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        VuforiaLocalizer vuforia = ClassFactory.getInstance().createVuforia(vuforiaParams);
+
+        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
+        vuforia.setFrameQueueCapacity(1);
+
+        BlockingQueue<VuforiaLocalizer.CloseableFrame> frameQueue = vuforia.getFrameQueue();
+
+
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-            // Setup a variable for each drive wheel to save power level for telemetry
             double leftFrontPower;
             double leftBackPower;
             double rightFrontPower;
             double rightBackPower;
-
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight
 
             double drive = gamepad1.left_stick_y;
             double turn = gamepad1.right_stick_x;
@@ -109,18 +142,67 @@ public class MiniMech extends LinearOpMode {
             rightFrontPower = Range.clip(drive - turn - strafe, -1.0, 1.0);
             rightBackPower = Range.clip(drive - turn + strafe, -1.0, 1.0);
 
-
-            // Send calculated power to wheels
             leftFront.setPower(leftFrontPower);
             leftBack.setPower(leftBackPower);
             rightFront.setPower(rightFrontPower);
             rightBack.setPower(rightBackPower);
 
-            // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f) (%.2f), right (%.2f) (%.2f)",
                     leftFrontPower, leftBackPower, rightFrontPower, rightBackPower);
             telemetry.update();
+
+            if (!frameQueue.isEmpty()) {
+                long start = System.nanoTime();
+
+                VuforiaLocalizer.CloseableFrame vuforiaFrame = null;
+                try {
+                    vuforiaFrame = frameQueue.take();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+
+                if (vuforiaFrame == null) {
+                    continue;
+                }
+
+                for (int i = 0; i < vuforiaFrame.getNumImages(); i++) {
+                    Image image = vuforiaFrame.getImage(i);
+                    if (image.getFormat() == PIXEL_FORMAT.RGB565) {
+                        int imageWidth = image.getWidth(), imageHeight = image.getHeight();
+                        ByteBuffer byteBuffer = image.getPixels();
+
+                        Bitmap original = Bitmap.createBitmap(imageWidth, imageHeight, Bitmap.Config.RGB_565);
+                        original.copyPixelsFromBuffer(byteBuffer);
+                        Bitmap scaled = Bitmap.createScaledBitmap(original, WIDTH, HEIGHT, false);
+
+                        dashboard.setImageQuality(QUALITY);
+                        dashboard.sendImage(scaled);
+
+
+                        try {
+                            File file = new File(FOLDER + UUID.randomUUID().toString() + ".PNG");
+                            file.createNewFile();
+                            FileOutputStream out = new FileOutputStream(file);
+                            scaled.compress(Bitmap.CompressFormat.PNG, 100, out);
+                            out.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                vuforiaFrame.close();
+
+                long ms = (System.nanoTime() - start) / 1_000_000;
+                long sleepTime = MIN_LOOP_TIME - ms;
+                if (sleepTime > 0) {
+                    sleep(sleepTime);
+                }
+            } else {
+                sleep(1);
+            }
+
         }
     }
 }
