@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vision.dogecv;
+package org.firstinspires.ftc.teamcode.vision.opencv;
 
 import org.firstinspires.ftc.teamcode.vision.GoldPos;
 import org.opencv.core.Core;
@@ -14,15 +14,15 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DogeCVPipeline {
+public class OpenCVPipeline {
 
     //Create the scorers used for the detector
     public MaxAreaScorer maxAreaScorer         = new MaxAreaScorer(0.01);
     public RatioScorer ratioScorer             = new RatioScorer(1.0,5);
 
     //Create the filters used
-    public DogeCVColorFilter yellowFilter = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW,100);
-    public DogeCVColorFilter whiteFilter  = new HSVRangeFilter(new Scalar(0,0,200), new Scalar(50,40,255));
+    public OpenCVColorFilter yellowFilter = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW,100);
+    public OpenCVColorFilter whiteFilter  = new HSVRangeFilter(new Scalar(0,0,200), new Scalar(50,40,255));
 
     // Results for the detector
     private GoldPos currentOrder = GoldPos.NONE_FOUND;
@@ -40,7 +40,7 @@ public class DogeCVPipeline {
 
     private Size adjustedSize = new Size(640, 480);
 
-    public Mat process(Mat input, DogeCVFinalStep finalStep) {
+    public Mat process(Mat input, OpenCVFinalStep finalStep) {
 
         // Copy input mat to working/display mats
         input.copyTo(displayMat);

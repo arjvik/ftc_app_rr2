@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vision.dogecv;
+package org.firstinspires.ftc.teamcode.vision.opencv;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -6,7 +6,7 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-public class HSVRangeFilter extends DogeCVColorFilter{
+public class HSVRangeFilter extends OpenCVColorFilter {
 
     private Scalar lower = new Scalar(255,255,255); // Lower HSV Color
     private Scalar upper = new Scalar(0,0,0); // Upper HSV Color

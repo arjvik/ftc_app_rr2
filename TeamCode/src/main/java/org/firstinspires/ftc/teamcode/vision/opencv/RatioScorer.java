@@ -1,11 +1,9 @@
-package org.firstinspires.ftc.teamcode.vision.dogecv;
+package org.firstinspires.ftc.teamcode.vision.opencv;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
-
-import java.util.List;
 
 /**
  * Created by Victo on 9/10/2018.

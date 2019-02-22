@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vision.dogecv;
+package org.firstinspires.ftc.teamcode.vision.opencv;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class LeviColorFilter extends DogeCVColorFilter {
+public class LeviColorFilter extends OpenCVColorFilter {
     // Color presets
     public enum ColorPreset{
         RED,

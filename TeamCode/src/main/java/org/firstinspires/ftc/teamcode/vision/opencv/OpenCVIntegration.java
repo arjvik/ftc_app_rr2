@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vision.dogecv;
+package org.firstinspires.ftc.teamcode.vision.opencv;
 
 import android.graphics.Bitmap;
 
@@ -25,9 +25,9 @@ import org.opencv.core.MatOfPoint;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class DogeCVIntegration implements VisionProvider {
+public class OpenCVIntegration implements VisionProvider {
 
-    private static final DogeCVFinalStep FINAL_STEP = DogeCVFinalStep.THREE_MINERALS;
+    private static final OpenCVFinalStep FINAL_STEP = OpenCVFinalStep.THREE_MINERALS;
 
     private VuforiaLocalizer vuforia;
     private BlockingQueue<VuforiaLocalizer.CloseableFrame> q;
@@ -37,7 +37,7 @@ public class DogeCVIntegration implements VisionProvider {
     private Telemetry telemetry;
     private FtcDashboard dashboard;
     private boolean enableTelemetry;
-    private DogeCVPipeline pipeline;
+    private OpenCVPipeline pipeline;
 
     private void initVuforia(HardwareMap hardwareMap, Viewpoint viewpoint) {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -62,7 +62,7 @@ public class DogeCVIntegration implements VisionProvider {
         this.enableTelemetry = enableTelemetry;
         if(enableTelemetry)
             dashboard = FtcDashboard.getInstance();
-        pipeline = new DogeCVPipeline();
+        pipeline = new OpenCVPipeline();
     }
 
     @Override
@@ -70,7 +70,7 @@ public class DogeCVIntegration implements VisionProvider {
 
     @Override
     public GoldPos detect() {
-        telemetry.addData("DogeCV State", state);
+        telemetry.addData("OpenCV State", state);
         switch (state) {
             case 0:
                 if (q.isEmpty())

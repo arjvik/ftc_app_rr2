@@ -26,7 +26,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class OpenCVIntegration implements VisionProvider {
+public class OLDOpenCVIntegration implements VisionProvider {
 
     private VuforiaLocalizer vuforia;
     private BlockingQueue<VuforiaLocalizer.CloseableFrame> q;
@@ -36,7 +36,7 @@ public class OpenCVIntegration implements VisionProvider {
     private Point lowest;
     private Telemetry telemetry;
     private FtcDashboard dashboard;
-    private RoverRuckusGripPipeline pipeline;
+    private OLDRoverRuckusGripPipeline pipeline;
     private boolean enableTelemetry;
 
     private int _numbefOfContours = -9999;
@@ -64,7 +64,7 @@ public class OpenCVIntegration implements VisionProvider {
         this.enableTelemetry = enableTelemetry;
         if(enableTelemetry)
             dashboard = FtcDashboard.getInstance();
-        pipeline = new RoverRuckusGripPipeline();
+        pipeline = new OLDRoverRuckusGripPipeline();
     }
 
     @Override

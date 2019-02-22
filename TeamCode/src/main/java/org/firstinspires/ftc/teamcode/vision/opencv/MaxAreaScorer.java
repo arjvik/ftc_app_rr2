@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vision.dogecv;
+package org.firstinspires.ftc.teamcode.vision.opencv;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
