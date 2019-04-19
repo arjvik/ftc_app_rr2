@@ -403,7 +403,7 @@ public class Game_6832 extends LinearOpMode {
         telemetry.addData("Please wait", "Initializing Sound");
         //telemetry.update();
         robot.ledSystem.setColor(LEDSystem.Color.CALM);
-        soundID = hardwareMap.appContext.getResources().getIdentifier("gracious", "raw", hardwareMap.appContext.getPackageName());
+        soundID = hardwareMap.appContext.getResources().getIdentifier("elteleopo", "raw", hardwareMap.appContext.getPackageName());
         boolean success = SoundPlayer.getInstance().preload(hardwareMap.appContext, soundID);
         if (success)
             soundState = 1;
@@ -446,6 +446,8 @@ public class Game_6832 extends LinearOpMode {
             robot.setAutonSingleStep(true);
             isHooked = false;
             joystickDriveStarted = true;
+            if (soundState == 1)
+                SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, soundID);
         }
 
         if(robot.getArticulation() == PoseBigWheel.Articulation.intake){
@@ -553,10 +555,11 @@ public class Game_6832 extends LinearOpMode {
             else
                 robot.collector.stopIntake();
         }
-        //Gracious Professionalism!
-        if (soundState == 1 && toggleAllowed(gamepad1.right_stick_button, right_stick_button)) {
-            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, soundID);
-        }
+
+//        //Gracious Professionalism!
+//        if (soundState == 1 && toggleAllowed(gamepad1.right_stick_button, right_stick_button)) {
+//            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, soundID);
+//        }
 
     }
 
