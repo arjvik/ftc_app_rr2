@@ -464,6 +464,11 @@ public class Game_6832 extends LinearOpMode {
             reverse = 1;
         }
 
+        if (gameMode == 0 && fastDamper)
+            pwrDamper = .8; //speed up reverse safe drive
+        else
+            pwrDamper = .65;
+
 
         pwrFwd = reverse*direction * pwrDamper * gamepad1.left_stick_y;
         pwrRot = -pwrDamper * .75 * gamepad1.right_stick_x;
@@ -473,13 +478,6 @@ public class Game_6832 extends LinearOpMode {
 
         pwrFwdR = direction * pwrDamper * gamepad1.right_stick_y;
         pwrStfR = direction * pwrDamper * gamepad1.right_stick_x;
-
-       /* if ((robot.getRoll() > 300) && robot.getRoll() < 350)
-            //todo - needs improvement - should be enabling slowmo mode, not setting the damper directly
-            //at least we are looking at the correct axis now - it was super janky - toggling the damper as the axis fluttered across 0 to 365
-            pwrDamper = .33;
-        else*/
-       pwrDamper = .65;
 
 
 
@@ -721,6 +719,8 @@ public class Game_6832 extends LinearOpMode {
         }
     }
 
+    boolean fastDamper = false;
+
     private void joystickDriveRegularModeReverse() {
 
         robot.ledSystem.setColor(LEDSystem.Color.PARTY_MODE_SMOOTH);
@@ -729,10 +729,10 @@ public class Game_6832 extends LinearOpMode {
 
         boolean doIntake = false;
 
-
         if (gamepad1.y) {
             robot.articulate(PoseBigWheel.Articulation.reverseDriving);
             isIntakeClosed = true;
+            fastDamper = true;
         }
         if (toggleAllowed(gamepad1.a, a)) {
             isIntakeClosed = !isIntakeClosed;
@@ -758,20 +758,24 @@ public class Game_6832 extends LinearOpMode {
                     pwrRot-=.25;
                     //robot.collector.setBeltToElbowModeEnabled();
                     isIntakeClosed = true;
+                    fastDamper = false;
                     break;
                 case 1:
                     robot.articulate(PoseBigWheel.Articulation.prereversedeposit);
                     //robot.collector.setBeltToElbowModeDisabled();
                     isIntakeClosed = true;
+                    fastDamper = false;
                     break;
                 case 2:
                     robot.articulate(PoseBigWheel.Articulation.reverseDeposit);
                     //robot.collector.setBeltToElbowModeDisabled();
+                    fastDamper = false;
                     break;
                 case 3:
                     robot.articulate(PoseBigWheel.Articulation.reverseDriving);
                     //robot.collector.setBeltToElbowModeDisabled();
                     isIntakeClosed = true;
+                    fastDamper = true;
                     break;
             }
         }
