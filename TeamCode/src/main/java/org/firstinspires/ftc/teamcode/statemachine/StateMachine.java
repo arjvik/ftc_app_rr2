@@ -99,31 +99,36 @@ public class StateMachine {
             return this;
         }
         
-        public Builder addSimultaneousStates(State... newStates) {
-        	states.add(new State() {
-        		private State[] newStates;
-        		private boolean[] completed;
-        		private int statesRemaining;
-        		
-				@Override
-				public boolean runState() {
-					for (int i = 0; i < newStates.length; i++)
-						if (!completed[i] && newStates[i].runState()) {
-							completed[i] = true;
-							statesRemaining--;
-						}
-					return statesRemaining == 0;
-				}
-				
-				public State init(State[] newStates) {
-					this.newStates = newStates;
-					completed = new boolean[newStates.length];
-					statesRemaining = newStates.length;
-					return this;
-				}
-        		
-        	}.init(newStates));
-        	return this;
+        public Builder addSimultaneousStates(final State... newStates) {
+            states.add(new State() {
+                private State[] newStates;
+                private boolean[] completed;
+                private int statesRemaining;
+                
+                @Override
+                public boolean runState() {
+                    for (int i = 0; i < newStates.length; i++)
+                        if (!completed[i] && newStates[i].runState()) {
+                            completed[i] = true;
+                            statesRemaining--;
+                        }
+                    if (statesRemaining == 0) {
+                        completed = new boolean[newStates.length];
+                        statesRemaining = newStates.length;
+                        return true;
+                    } else
+                        return false;
+                }
+                
+                public State init(State[] newStates) {
+                    this.newStates = newStates;
+                    completed = new boolean[newStates.length];
+                    statesRemaining = newStates.length;
+                    return this;
+                }
+                
+            }.init(newStates));
+            return this;
         }
 
         private static long futureTime(float seconds){ return System.nanoTime() + (long) (seconds * 1e9); }
