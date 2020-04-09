@@ -875,4 +875,9 @@ public class FtcRobotControllerActivity extends Activity
         return true;
       }
     }
+    
+    public RobotConfigFileManager getConfigFileManager() {
+    	return cfgFileMgr;
+    }
+    
 }

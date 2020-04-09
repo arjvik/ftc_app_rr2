@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
-
+import com.qualcomm.ftccommon.configuration.RobotConfigFile;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -19,6 +19,8 @@ import java.util.HashMap;
 /**
  * Created by tycho on 2/18/2017. This was copied from Team FIXIT. All hail team FIXIT.
  * This is simply a set of utils to reference the main robot controller activity for convenience
+ * 
+ * Updated by Arjun to obtain current robot configuration (xml)
  */
 
 public class RC {
@@ -44,7 +46,12 @@ public class RC {
     public static Context c() {
         return AppUtil.getInstance().getActivity();
     }//context
+    
     public static FtcRobotControllerActivity a() {
         return ((FtcRobotControllerActivity) AppUtil.getInstance().getActivity());
-    }
+    }//activity
+    
+    public static RobotConfigFile config() {
+        return a().getConfigFileManager().getActiveConfig();
+    }//config
 }
